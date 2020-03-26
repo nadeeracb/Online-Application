@@ -1,3 +1,32 @@
+## An ORM framework for Google Apps Script
+
+This framework allows you to easily integrate Google Sheet with your web application (GAS). You just need to add one row top of the all rows in the spreadsheet with relavant column names.
+Those columns names will be your object keys. A sample spreadsheet attached herewith [1].
+
+1\. https://docs.google.com/spreadsheets/d/1uM-QIUoCSRJcrhx3THBmDajxUbaxiOdMRYpiBoill-Q/edit?usp=sharing
+
+### How to use this framework ?
+
+This is very easy to use. Only following code you need to use.
+
+```
+ DatabaseOperations.cacheEnabled = false;
+ DatabaseOperations.initilizeDatabase('1uM-QIUoCSRJcrhx3THBmDajxUbaxiOdMRYpiBoill-Q'); // specify your spreadsheet ID
+ DatabaseOperations.openDatabaseConnection('mytable'); // specify your sheet name
+ const foundObj = DatabaseOperations.queryDatabase('KEY:NIC === "92165445V" && KEY:RegNo === "S/10/586"'); // this is how you make a query. Make sure to use "KEY:" prefix for all keys
+ //const newObject = DatabaseOperations.cloneObject(foundObj); // This is how you clone Object
+ // newObject.RegNo = 'S/10/588'; // this is how you change properties
+ // DatabaseOperations.updateItem(foundObj, newObject); // this is how you update a row in spreadsheet
+ // DatabaseOperations.deleteItem(foundObj); // this is how you delete a row in spreadsheet
+
+ // foundObj.RegNo = 'S/10/587';
+ // DatabaseOperations.saveItem(foundObj); // this is how you save a new row in spreadsheet
+ console.log(`found item : ${JSON.stringify(foundObj)}`);
+```
+
+The MIT License. Developed by **[Lahiru J Ekanayake](https://lk.linkedin.com/in/lahirujekanayake)**. Faculty of Science, University of Peradeniya.
+Developed on top of app-script-starter and that credit should go to the original author.
+
 ![Google Apps Script Development with ES6](https://digitalinspiration.com/images/google-apps-script-development.png)
 
 ## Google Apps Script Development 💯
@@ -21,7 +50,7 @@ You also need to install Node.js which includes the npm package manager.
 1\. Clone the repository and install npm dependencies
 
 ```
-git clone https://github.com/labnol/apps-script-starter my-project
+git clone https://github.com/fosuop/appscript-project-template
 cd my-project
 npm install
 ```
@@ -60,16 +89,6 @@ The default `.claspignore` file of the Apps Script Starter kit will push all the
 
 Create a new repository in Github and make a note of the URL of the new repository. Next, open the terminal and run the above commands to push your Apps Script project to Github.
 
-## :fire: Meet the Developer
-
-<img align="left" width="100" height="100" src="https://pbs.twimg.com/profile_images/1144978512832368640/Ej7Zz7E9_400x400.jpg">
-
-[Amit Agarwal](https://digitalinspiration.com/google-developer) is a web geek, Google Developers Expert (GSuite, Google Apps Script) and author of [labnol.org](https://www.labnol.org/), a popular tech how-to website. He frequently uses [Google Apps Script](https://ctrlq.org/) to automate workflows and enhance productivity.
-
-The starter kit is used by [Digital Inspiration](https://digitalinspiration.com/) for building popular Google add-ons including [Gmail Mail Merge](https://chrome.google.com/webstore/detail/mail-merge-with-attachmen/nifmcbjailaccmombpjjpijjbfoicppp), [Google Forms Notifications](https://chrome.google.com/webstore/detail/email-notifications-for-f/acknfdkglemcidajjmehljifccmflhkm) and [Document Studio](https://chrome.google.com/webstore/detail/document-studio/nhgeilcelhkmajkfgmgldbinmgjjajlb).
-
-Reach the author on [Twitter](https://twitter.com/labnol) or email amit@labnol.org
-
 ### :star2: Credit/Acknowledgment
 
 #### Babel
@@ -99,5 +118,3 @@ A code formatter that will beautify your JavaScript, JSON, HTML and CSS styleshe
 #### Airbnb
 
 Developers have their own unique style of writing code. [Airbnb's JavaScript style guide](https://github.com/airbnb/javascript/blob/master/README.md#airbnb-javascript-style-guide-) outlines how JavaScript code should be written and adheres to the rules.
-
- 

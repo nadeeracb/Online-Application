@@ -1,21 +1,15 @@
 {
   "root": true,
   "parser": "babel-eslint",
-  "extends": [
-    "eslint:recommended",
-    "airbnb-base",
-    "plugin:prettier/recommended"
-  ],
-  "plugins": [
-    "prettier",
-    "googleappsscript"
-  ],
+  "extends": ["eslint:recommended", "airbnb-base", "plugin:prettier/recommended"],
+  "plugins": ["prettier", "googleappsscript"],
   "env": {
     "googleappsscript/googleappsscript": true
   },
   "rules": {
     "prettier/prettier": "error",
-    "import/prefer-default-export": "error"
+    "import/prefer-default-export": "error",
+    "no-eval": 0
   },
   "globals": {
     "OAuth1": true,

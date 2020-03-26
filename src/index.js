@@ -1,8 +1,7 @@
-import getDataFromSupport from './scripts/support';
+import Resources from './scripts/resources';
 
-function getData() {
-  Logger.log('Hello world VS CODE');
+function testDBoperation() {
+  Resources.sampleExecution();
 }
 
-global.getData = getData;
-global.getDataFromSupport = getDataFromSupport;
+global.testDBoperation = testDBoperation;
