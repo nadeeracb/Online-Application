@@ -1,6 +1,6 @@
 import Utils from './utils';
 
-class DatabaseOperations {
+class Database {
   // initialize the database using Id only. Because if we open the sheet it will be an extra cost
   static initilizeDatabase(databaseId) {
     this.DBID = databaseId;
@@ -30,7 +30,9 @@ class DatabaseOperations {
   }
 
   static saveItem(newObject) {
-    let retVal = '';
+    //  console.log(`dataj : ${JSON.stringify(newObject)}`);
+    const retVal = {};
+    retVal.status = false;
     try {
       const spArray = [];
       if (newObject) {
@@ -39,9 +41,22 @@ class DatabaseOperations {
         });
       }
       if (spArray.length > 0) {
-        this.connectedDatabse.appendRow(spArray);
-        SpreadsheetApp.flush();
-        retVal = true;
+        const lock = LockService.getScriptLock();
+        lock.waitLock(100000);
+        try {
+          /*   const lastRow = this.connectedDatabse.getLastRow();
+          this.connectedDatabse.getRange(lastRow + 1, 1, 1, 13).setValues([spArray]);
+          retVal.newId = lastRow + 1; */
+          const sheeta = this.connectedDatabse.appendRow(spArray);
+          retVal.newId = sheeta.getLastRow();
+        } catch (eo1) {
+          console.error(`Error ocuured while lock waiting : , ${JSON.stringify(newObject)}`, eo1);
+        } finally {
+          lock.releaseLock();
+        }
+
+        // this.connectedDatabse.appendRow(spArray);
+        //  SpreadsheetApp.flush();
         if (this.cacheEnabled) {
           CacheService.getScriptCache().remove(this.CACHE_KEY);
         }
@@ -50,6 +65,8 @@ class DatabaseOperations {
         console.error(`No data inside array for saving`);
         throw new Error(`Error ocuured whilesave data as an array`);
       }
+      retVal.status = true;
+      retVal.data = newObject;
 
       return retVal;
     } catch (e) {
@@ -94,6 +111,41 @@ class DatabaseOperations {
     }
   }
 
+  static updateDirect(object) {
+    const retVal = '';
+    try {
+      const spArray = [];
+      if (object) {
+        spArray.push('=ROW()');
+        spArray.push(object.eId);
+        spArray.push(object.regNo);
+        spArray.push(object.acYear);
+        spArray.push(object.semester);
+        spArray.push(object.batch);
+        spArray.push(object.courseCode);
+        spArray.push(object.remark);
+        spArray.push(object.credits);
+        spArray.push(object.date);
+      }
+      if (spArray.length > 0) {
+        const outerArray = [];
+        outerArray.push(spArray);
+        this.connectedDatabse.getRange(object.id, 1, 1, spArray.length).setValues(outerArray);
+        if (this.cacheEnabled) {
+          CacheService.getScriptCache().remove(this.CACHE_KEY);
+        }
+      } else {
+        console.error(`No data inside array for updating`);
+        throw new Error(`Error ocuured while updating data as an array`);
+      }
+
+      return retVal;
+    } catch (e) {
+      console.error(`Error ocuured while updateDirect new Request in DBOperations${e.lineNumber}`, e);
+      throw new Error(`Error ocuured while updateDirect in DBOperations${e}`);
+    }
+  }
+
   static deleteItem(oldObject) {
     let retVal = 0;
     try {
@@ -119,6 +171,42 @@ class DatabaseOperations {
       return retVal;
     } catch (e) {
       console.error(`Error ocuured while deleting new Request in DBOperations${e.lineNumber}`, e);
+      throw new Error(`Error ocuured while deleting in DBOperations${e}`);
+    }
+  }
+
+  static deleteThreadSafe(oldObject) {
+    let retVal = 0;
+    try {
+      const spArray = [];
+      if (oldObject) {
+        Object.entries(oldObject).forEach(([, value]) => {
+          spArray.push(`${value}_DELETED`);
+        });
+      }
+      const oldArray = [];
+      if (oldObject) {
+        Object.entries(oldObject).forEach(([, value]) => {
+          oldArray.push(value);
+        });
+      }
+      if (spArray.length > 0) {
+        const foundRow = this.findObjectRow(oldArray);
+        const outerArray = [];
+        outerArray.push(spArray);
+        this.connectedDatabse.getRange(foundRow + 1, 1, 1, spArray.length).setValues(outerArray);
+        if (this.cacheEnabled) {
+          CacheService.getScriptCache().remove(this.CACHE_KEY);
+        }
+        retVal = 1;
+      } else {
+        console.error(`No data inside array for deleting`);
+        throw new Error(`Error ocuured while deleting data as an array`);
+      }
+
+      return retVal;
+    } catch (e) {
+      console.error(`Error ocuured while deleting  a request in DBOperations${e.lineNumber}`, e);
       throw new Error(`Error ocuured while deleting in DBOperations${e}`);
     }
   }
@@ -209,7 +297,126 @@ class DatabaseOperations {
         }
       }
     }
-    return this.dataArray.length > 1 ? this.dataArray : this.dataArray[0];
+    return this.dataArray;
+  }
+
+  static buildGoogleQuery(query) {
+    const metaInfo = Utils.getSheetStructure(this.sheetName).columns;
+    let newQuery = query;
+    Object.entries(metaInfo).forEach(([key, value]) => {
+      newQuery = this.replaceAll(newQuery, value, key);
+    });
+    return newQuery;
+  }
+
+  static replaceAll(text, search, replacement) {
+    return text.replace(new RegExp(search, 'g'), replacement);
+  }
+
+  static googleQuery(query) {
+    const generatedQuery = this.buildGoogleQuery(query);
+    const foundObj = this.pareGoogleQuery(this.sendGoogleQuery(generatedQuery));
+    return foundObj;
+  }
+
+  /**
+   * Use this method only for large set of data, more than 20,000 records approximately
+   * @param {*} query is the Google Query Language synatx you must pass
+   */
+  static sendGoogleQuery(query) {
+    try {
+      const metaInfo = Utils.getSheetStructure(this.sheetName);
+      const qvizURL = `https://docs.google.com/spreadsheets/d/${this.DBID}/gviz/tq?tqx=out:json&headers=1&sheet=${
+        this.sheetName
+      }&range=${metaInfo.range}&tq=${encodeURIComponent(query)}`;
+      const ret = UrlFetchApp.fetch(qvizURL, {
+        headers: { Authorization: `Bearer ${ScriptApp.getOAuthToken()}` }
+      }).getContentText();
+      return JSON.parse(
+        ret
+          .replace('/*O_o*/', '')
+          .replace('google.visualization.Query.setResponse(', '')
+          .slice(0, -2)
+      );
+    } catch (e) {
+      console.error('Error occured while sending URL Fetch request to Google Sheet API. ', e);
+      throw new Error(`Error occured while sending URL Fetch request to Google Sheet API.${e}`);
+    }
+  }
+
+  static pareGoogleQuery(jsonObject) {
+    const { rows } = jsonObject.table;
+    const { arrayNames } = Utils.getSheetStructure(this.sheetName);
+    const objectArray = [];
+    rows.forEach(function(item) {
+      const newObject = {};
+      let i = 0;
+      item.c.forEach(function(innerItem) {
+        if (innerItem && innerItem.v) {
+          newObject[arrayNames[i]] = innerItem.v;
+        }
+        i += 1;
+      });
+
+      objectArray.push(newObject);
+    });
+    return objectArray;
+  }
+
+  static batchUpdate(objectArray) {
+    const metaInfo = Utils.getSheetStructure(this.sheetName);
+    const generatedArray = [];
+    const rangeValues = metaInfo.range.split(':');
+    let generatedRange = '';
+    const { sheetName } = this;
+    objectArray.forEach(function(item) {
+      generatedRange = `${sheetName}!${rangeValues[0]}${item.id}:${rangeValues[1]}${item.id}`;
+      const newObject = {};
+      newObject.range = generatedRange;
+      newObject.majorDimension = 'ROWS';
+      const dataArray = [];
+      metaInfo.arrayNames.forEach(function(keyItem, i) {
+        // if (item[keyItem]) {
+        if (i === 0) {
+          dataArray.push('=ROW()');
+        } else {
+          dataArray.push(item[keyItem]);
+        }
+      });
+
+      newObject.values = [dataArray];
+      generatedArray.push(newObject);
+      // generatedArray
+    });
+    const request = {
+      valueInputOption: 'USER_ENTERED',
+      data: generatedArray
+    };
+    Sheets.Spreadsheets.Values.batchUpdate(request, this.DBID);
+  }
+
+  static batchUpdateNew(rConditions) {
+    const lock = LockService.getScriptLock();
+    lock.waitLock(750000);
+    try {
+      const sid = this.connectedDatabse.getSheetId();
+      const requests = Object.entries(rConditions).map(([k, v]) => ({
+        findReplace: {
+          find: k.toString(),
+          replacement: v.toString(),
+          matchEntireCell: true,
+          sheetId: sid
+        }
+      }));
+
+      Sheets.Spreadsheets.batchUpdate({ requests }, this.DBID);
+      console.info('unenroll suceeses');
+    } catch (e) {
+      console.error('Error occured while updating batch new in DB. ', e);
+      // throw new Error(`Error occured while updating batch new in DB. ${e}`);
+    } finally {
+      lock.releaseLock();
+    }
   }
 
   static cloneObject(object) {
@@ -222,4 +429,4 @@ class DatabaseOperations {
   }
 }
 
-export default DatabaseOperations;
+export default Database;

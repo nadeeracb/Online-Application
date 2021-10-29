@@ -3,9 +3,16 @@ const TIME_ZONE = 'Asia/Colombo';
 const DATE_FORMAT = 'MM/dd/yyyy HH:mm:ss';
 const UUID_FORMAT = 'MMddyyyyHHmmss';
 const APP_NAME = 'Sample App Name';
+const ALIASMAIL = 'nadeerab@sci.pdn.ac.lk';
+const UUID_CODE = 'LM';
+
+const DBID = '1bQnEJqblQ5U4hwq-QdFDjNXqtrLzBWjeVrTqtPwfNMk';
+const SHEET = 'leave-logs';
+const APP_ROLE = 'roles';
 
 let cKey = null;
 let chunks = [];
+
 class Utils {
   static ChunkyCache(cache, chunkSize) {
     return {
@@ -58,7 +65,7 @@ class Utils {
 
   static generateUUID() {
     const date = Utilities.formatDate(new Date(), TIME_ZONE, UUID_FORMAT);
-    return `TR_${date}`;
+    return `${UUID_CODE}_${date}`;
   }
 
   static parseDate(dateValue) {
@@ -72,6 +79,27 @@ class Utils {
 
   static getAppName() {
     return APP_NAME;
+  }
+
+  static getScriptUrl() {
+    const url = ScriptApp.getService().getUrl();
+    return url;
+  }
+
+  static getALIASMAIL() {
+    return ALIASMAIL;
+  }
+
+  static getMainDBID() {
+    return DBID;
+  }
+
+  static getMainSheetName() {
+    return SHEET;
+  }
+
+  static getAppRoleSheetName() {
+    return APP_ROLE;
   }
 
   static errHandler(e, strFunc) {

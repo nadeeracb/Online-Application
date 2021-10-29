@@ -1,0 +1,106 @@
+<script>
+  $(document).ready(function() {
+    //Date
+    var d = new Date();
+    var strDate = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+    $('#sysDate').text(strDate);
+
+    //Export Data Table Bottom Caption
+    //$('#tblData').append('<caption style="caption-side: bottom">Leave Details</caption>');
+
+    //Data Table
+    var table = $('#tblData').DataTable({
+      rowReorder: {
+        selector: 'td:nth-child(2)'
+      },
+      responsive: true,
+      lengthMenu: [
+        'copy',
+        {
+          extend: 'excel',
+          messageTop: 'This is Leave Details'
+        },
+        [10, 25, 50, -1],
+        [10, 25, 50, 'All']
+      ],
+      dom: 'Bfrtip',
+      buttons: ['copy', 'excel', 'pdf', 'print']
+    });
+
+    //Initial Loading
+    showLoadingModal('Please Wait for Loading...');
+    google.script.run
+      .withFailureHandler(onFailure)
+      .withSuccessHandler(initialLoading)
+      .initialLoading();
+  });
+
+  function showSuccessModal(heading, message) {
+    $('#successModalHeading').text(heading);
+    $('#successModalMessage').text(message);
+
+    $('#modalSuccess').modal('show');
+    //$('#modalSuccess').modal('hide');
+  }
+
+  function showErrorModal(heading, message) {
+    $('#errorModalHeading').text(heading);
+    $('#errorModalMessage').text(message);
+
+    $('#modalError').modal('show');
+  }
+
+  function showLoadingModal(message) {
+    $('#loadingModalMessage').text(message);
+
+    $('#modalLoading').modal('show');
+  }
+
+  function showAppAlert(type, heading, message) {
+    if (type.toUpperCase() == 'SUCCESS') {
+      $('#appAlert').addClass('alert-success');
+    } else if (type.toUpperCase() == 'ERROR' || type.toUpperCase() == 'DANGER') {
+      $('#appAlert').addClass('alert-danger');
+    } else if (type.toUpperCase() == 'WARNING') {
+      $('#appAlert').addClass('alert-warning');
+    } else {
+      $('#appAlert').addClass('alert-info');
+    }
+
+    $('#appAlertHeading').text(heading);
+    $('#appAlertMessage').text(message);
+
+    $('#appAlert')
+      .show()
+      .delay(10000)
+      .fadeOut();
+  }
+
+  function onFailure(err) {
+    $('#modalLoading').modal('hide');
+    showErrorModal('Error Occured..!', err.message);
+  }
+
+  function initialLoading(retdata) {
+    console.log(retdata);
+    $('#modalLoading').modal('hide');
+    var data = JSON.parse(retdata);
+
+    if (data) {
+      setMenu(data.scriptUrl);
+      setUserInfo(data.appUser.data[0]);
+    }
+  }
+
+  function setMenu(appurl) {
+    $('#app-menu-01').attr('href', appurl);
+    $('#app-menu-02').attr('href', appurl + '?page=hod');
+  }
+
+  function setUserInfo(user) {
+    $('#username').html(user.Name + '<br/>' + user.Email);
+    $('#userrole').text('(' + user.Role + ')');
+  }
+
+  function logOut() {}
+</script>
