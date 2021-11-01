@@ -6,8 +6,8 @@ const APP_NAME = 'Sample App Name';
 const ALIASMAIL = 'nadeerab@sci.pdn.ac.lk';
 const UUID_CODE = 'LM';
 
-const DBID = '1bQnEJqblQ5U4hwq-QdFDjNXqtrLzBWjeVrTqtPwfNMk';
-const SHEET = 'leave-logs';
+const DBID = '1sY8dx-7tsg8dtwWi901Gx1Wmhr2dU8IQm2wZUzM9ITs';
+const SHEET = 'Form Responses 1';
 const APP_ROLE = 'roles';
 
 let cKey = null;
