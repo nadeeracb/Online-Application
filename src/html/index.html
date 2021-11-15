@@ -75,7 +75,7 @@
         <!-- az-navbar-header -->
         <div class="az-navbar-search">
           <h5>
-            Faculty of Science
+            Academic Establishment
             <small>University of Peradeniya</small>
           </h5>
         </div>
@@ -84,9 +84,6 @@
           <li class="nav-label">Main Menu</li>
           <li class="nav-item active show">
             <a href="#" id="app-menu-01" class="nav-link app-menu"><i class="typcn typcn-clipboard"></i>Dashboard</a>
-          </li>
-          <li class="nav-item show">
-            <a href="?page=hod" id="app-menu-02" class="nav-link app-menu"><i class="typcn typcn-clipboard"></i>HOD</a>
           </li>
           <!-- nav-item -->
         </ul>
@@ -101,8 +98,10 @@
         <div class="media-body">
           <div class="az-content-header">
             <div>
-              <h6 class="az-content-title tx-18 mg-b-5">APP Name</h6>
-              <p class="az-content-text tx-13 mg-b-0">Faculty of Science. University of Peradeniya.</p>
+              <h6 class="az-content-title tx-18 mg-b-5" id="appName">APP Name</h6>
+              <p class="az-content-text tx-13 mg-b-0" id="appDescription">
+                Faculty of Science. University of Peradeniya.
+              </p>
             </div>
             <div class="az-content-header-right">
               <div class="media">
@@ -140,31 +139,8 @@
                     aria-controls="home"
                     aria-selected="true"
                     class="nav-link app-tab border-0 text-uppercase font-weight-bold active"
+                    style="display: none;"
                     >Home</a
-                  >
-                </li>
-                <li class="nav-item flex-sm-fill">
-                  <a
-                    id="log-tab"
-                    data-toggle="tab"
-                    href="#log"
-                    role="tab"
-                    aria-controls="log"
-                    aria-selected="false"
-                    class="nav-link border-0 text-uppercase font-weight-bold"
-                    >Log</a
-                  >
-                </li>
-                <li class="nav-item flex-sm-fill">
-                  <a
-                    id="contact-tab"
-                    data-toggle="tab"
-                    href="#contact"
-                    role="tab"
-                    aria-controls="contact"
-                    aria-selected="false"
-                    class="nav-link border-0 text-uppercase font-weight-bold"
-                    >Contact</a
                   >
                 </li>
               </ul>
@@ -174,159 +150,610 @@
               <!--TAB PAGE-->
               <div id="myTabContent" class="tab-content">
                 <!--Home Tab-->
-                <div id="home" role="tabpanel" aria-labelledby="home-tab" class="tab-pane fade px-1 py-5 show active">
+                <div id="home" role="tabpanel" aria-labelledby="home-tab" class="tab-pane fade px-1 py-0 show active">
                   <form id="appMainForm" class="needs-validation" enctype="multipart/form-data" novalidate>
-                    <div class="row row-sm mg-b-20">
-                      <div class="col-lg-4">
-                        <p class="mg-b-10">Single Select</p>
-                        <input class="form-control" placeholder="Input box" type="text" />
+                    <div class="card bd-0 mg-b-20">
+                      <div class="card-header tx-medium bd-0 tx-white" style="background-color:#34495E;">
+                        Vacancy
                       </div>
-                      <div class="col-lg-4">
-                        <p class="mg-b-10">Single Select</p>
-                        <select
-                          class="form-control select2-no-search select2-hidden-accessible"
-                          data-select2-id="13"
-                          tabindex="-1"
-                          aria-hidden="true"
-                        >
-                          <option label="Choose one" data-select2-id="15"></option>
-                          <option value="Firefox" data-select2-id="25">Firefox</option>
-                          <option value="Chrome" data-select2-id="26">Chrome</option>
-                          <option value="Safari" data-select2-id="27">Safari</option>
-                          <option value="Opera" data-select2-id="28">Opera</option>
-                          <option value="Internet Explorer" data-select2-id="29">Internet Explorer</option>
-                        </select>
+                      <!-- card-header -->
+                      <div class="card-body bd bd-t-0">
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Category</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="category"
+                              name="category"
+                            >
+                              <option label="Choose one" value=""></option>
+                              <option value="Academic">Academic</option>
+                              <option value="Academic Support">Academic Support</option>
+                            </select>
+                          </div>
+
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Post</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="post"
+                              name="post"
+                            >
+                              <option label="Choose one" value=""></option>
+                            </select>
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Vacancy ID</p>
+                            <input
+                              id="vacancyID"
+                              name="vacancyID"
+                              class="form-control"
+                              placeholder="Vacancy ID"
+                              type="text"
+                              readonly
+                            />
+                          </div>
+                        </div>
+
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-8">
+                            <p class="mg-b-10">Faculty</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="faculty"
+                              name="faculty"
+                            ></select>
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Department</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="department"
+                              name="department"
+                            ></select>
+                          </div>
+                        </div>
                       </div>
-                      <div class="col-lg-4">
-                        <p class="mg-b-10">Single Select</p>
-                        <div class="custom-file">
-                          <input type="file" class="custom-file-input" id="customFile" />
-                          <label class="custom-file-label" for="customFile">Choose file</label>
+                      <!-- card-body -->
+                    </div>
+
+                    <div class="card bd-0 mg-b-20">
+                      <div class="card-header tx-medium bd-0 tx-white" style="background-color:#34495E;">
+                        Personal Details
+                      </div>
+                      <!-- card-header -->
+                      <div class="card-body bd bd-t-0">
+                        <!-- card-body -->
+
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-2">
+                            <p class="mg-b-10">Gender</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="gender"
+                              name="gender"
+                            >
+                              <option label="Choose one" value="">Choose one</option>
+                              <option label="Female">Female</option>
+                              <option value="Male">Male</option>
+                              <option value="Prefer not to say">Prefer not to say</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+                          <div class="col-lg-2">
+                            <p class="mg-b-10">Title</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="title"
+                              name="title"
+                            >
+                              <option label="Choose one" value="">Choose one</option>
+                              <option value="Mr.">Mr.</option>
+                              <option value="Ms.">Ms.</option>
+                              <option value="Mrs.">Mrs.</option>
+                              <option value="Dr.">Dr.</option>
+                              <option value="Prof.">Prof.</option>
+                              <option value="Rev.">Rev.</option>
+                              <option value="Rev.(Dr.)">Rev.(Dr.)</option>
+                              <option value="Rev.(Prof.)">Rev.(Prof.)</option>
+                            </select>
+                          </div>
+
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">First Name</p>
+                            <input
+                              id="firstName"
+                              name="firstName"
+                              class="form-control"
+                              placeholder="First Name"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Surname</p>
+                            <input id="surname" name="surname" class="form-control" placeholder="Surname" type="text" />
+                          </div>
+                        </div>
+
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-10">
+                            <p class="mg-b-10">Full Name</p>
+                            <input
+                              id="fullName"
+                              name="fullName"
+                              class="form-control"
+                              placeholder="Full Name"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-2">
+                            <p class="mg-b-10">Date of Birth</p>
+                            <input type="date" id="dob" name="dob" class="form-control" />
+                          </div>
+                        </div>
+
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-10">
+                            <p class="mg-b-10">Postal Address</p>
+                            <input
+                              id="address"
+                              name="address"
+                              class="form-control"
+                              placeholder="Postal Address"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-2">
+                            <p class="mg-b-10">NIC</p>
+                            <input id="nic" name="nic" class="form-control" placeholder="NIC" type="text" />
+                          </div>
+                        </div>
+
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Mobile</p>
+                            <input id="mobile" name="mobile" class="form-control" placeholder="Mobile" type="text" />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Telephone</p>
+                            <input id="tp" name="tp" class="form-control" placeholder="Telephone" type="text" />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Email</p>
+                            <input id="email" name="email" class="form-control" placeholder="Email" type="email" />
+                          </div>
+                        </div>
+
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-3">
+                            <p class="mg-b-10">District</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="district"
+                              name="district"
+                            >
+                            </select>
+                          </div>
+                          <div class="col-lg-3">
+                            <p class="mg-b-10">Electorate</p>
+                            <input
+                              id="electorate"
+                              name="electorate"
+                              class="form-control"
+                              placeholder="Electorate"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-3">
+                            <p class="mg-b-10">Province</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="province"
+                              name="province"
+                            >
+                            </select>
+                          </div>
+                          <div class="col-lg-3">
+                            <p class="mg-b-10">City</p>
+                            <input id="city" name="city" class="form-control" placeholder="City" type="text" />
+                          </div>
+                        </div>
+
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Nationality</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="nationality"
+                              name="nationality"
+                            >
+                              <option label="Choose one" value="">Choose one</option>
+                              <option value="Sri Lankan">Sri Lankan</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Citizenship</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="citizenship"
+                              name="citizenship"
+                            >
+                              <option label="Choose one" value="">Choose one</option>
+                              <option value="By Decent">By Decent</option>
+                              <option value="By Registration">By Registration</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">CivilStatus</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="civilstatus"
+                              name="civilstatus"
+                            >
+                              <option label="Choose one" value="">Choose one</option>
+                              <option value="Single">Single</option>
+                              <option value="Married">Married</option>
+                              <option value="Divorced">Divorced</option>
+                              <option value="Widowed">Widowed</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="row row-sm mg-b-20" id="spouseDIV" style="display: none;">
+                          <div class="col-lg-8">
+                            <p class="mg-b-10">Spouse Name</p>
+                            <input
+                              id="spouseName"
+                              name="spouseName"
+                              class="form-control"
+                              placeholder="Spouse Name"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Spouse Designation</p>
+                            <input
+                              id="spouseDesignation"
+                              name="spouseDesignation"
+                              class="form-control"
+                              placeholder="Spouse Designation"
+                              type="text"
+                            />
+                          </div>
+                        </div>
+
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-8">
+                            <p class="mg-b-10">Highest Education Qualification</p>
+                            <input
+                              id="highestEducation"
+                              name="highestEducation"
+                              class="form-control"
+                              placeholder="Highest Education Qualification"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Proficiency on Languages</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="proficiencyOnLanguages"
+                              name="proficiencyOnLanguages"
+                            >
+                              <option label="Choose one" value="">Choose one</option>
+                              <option value="Sinhala">Only Sinhala</option>
+                              <option value="Tamil">Only Tamil</option>
+                              <option value="English">Only English</option>
+                              <option value="Sinhala and Tamil">Sinhala and Tamil</option>
+                              <option value="Sinhala and English">Sinhala and English</option>
+                              <option value="Tamil and English">Tamil and English</option>
+                              <option value="Sinhala and Tamil">Sinhala, Tamil and English</option>
+                            </select>
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div class="row row-sm mg-b-20">
-                      <div class="col-lg-4">
-                        <p class="mg-b-10">Single Select</p>
-                        <textarea rows="3" class="form-control" placeholder="Textarea"></textarea>
+
+                    <div class="card bd-0 mg-b-20">
+                      <div class="card-header tx-medium bd-0 tx-white" style="background-color:#34495E;">
+                        Basic Degree
+                      </div>
+                      <!-- card-header -->
+                      <div class="card-body bd bd-t-0">
+                        <!-- card-body -->
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-8">
+                            <p class="mg-b-10">Basic Degree</p>
+                            <input
+                              id="basicDegree"
+                              name="basicDegree"
+                              class="form-control"
+                              placeholder="Basic Degree"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">University</p>
+                            <input
+                              id="bdUniversity"
+                              name="bdUniversity"
+                              class="form-control"
+                              placeholder="University"
+                              type="text"
+                            />
+                          </div>
+                        </div>
+
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Year</p>
+                            <input id="bdYear" name="bdYear" class="form-control" type="number" />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Class</p>
+                            <input id="bdClass" name="bdClass" class="form-control" placeholder="Class" type="text" />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">GPA</p>
+                            <input id="bdGPA" name="bdGPA" class="form-control" placeholder="GPA" type="text" />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div class="row row-sm mg-b-20">
-                      <div class="col-sm-12 col-md-12 mg-t-10 mg-md-t-0">
-                        <button class="btn btn-primary btn-rounded float-right" onclick="Save()">
-                          <i class="fa fa-save"></i> Save
-                        </button>
-                        <button class="btn btn-warning btn-rounded float-right">
-                          <i class="fa fa-edit"></i> Update
-                        </button>
+
+                    <div class="card bd-0 mg-b-20">
+                      <div class="card-header tx-medium bd-0 tx-white" style="background-color:#34495E;">
+                        Postgraduate Degree 01
                       </div>
+                      <!-- card-header -->
+                      <div class="card-body bd bd-t-0">
+                        <!-- card-body -->
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Postgraduate Degree</p>
+                            <input
+                              id="pgDegree01"
+                              name="pgDegree01"
+                              class="form-control"
+                              placeholder="Postgraduate Degree"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">University</p>
+                            <input
+                              id="pdg01University"
+                              name="pdg01University"
+                              class="form-control"
+                              placeholder="University"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Country</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="pdg01Country"
+                              name="pdg01Country"
+                            >
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Year</p>
+                            <input id="pgd01Year" name="pgd01Year" class="form-control" type="number" />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Class</p>
+                            <input
+                              id="pgd01Class"
+                              name="pgd01Class"
+                              class="form-control"
+                              placeholder="Class"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">GPA</p>
+                            <input id="pgd01GPA" name="pgd01GPA" class="form-control" placeholder="GPA" type="text" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="card bd-0 mg-b-20">
+                      <div class="card-header tx-medium bd-0 tx-white" style="background-color:#34495E;">
+                        Postgraduate Degree 02
+                      </div>
+                      <!-- card-header -->
+                      <div class="card-body bd bd-t-0">
+                        <!-- card-body -->
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Postgraduate Degree</p>
+                            <input
+                              id="pgDegree02"
+                              name="pgDegree02"
+                              class="form-control"
+                              placeholder="Postgraduate Degree"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">University</p>
+                            <input
+                              id="pdg02University"
+                              name="pdg02University"
+                              class="form-control"
+                              placeholder="University"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Country</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="pdg02Country"
+                              name="pdg02Country"
+                            >
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Year</p>
+                            <input id="pdg02Year" name="pdg02Year" class="form-control" type="number" />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Class</p>
+                            <input
+                              id="pdg02Class"
+                              name="pdg02Class"
+                              class="form-control"
+                              placeholder="Class"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">GPA</p>
+                            <input id="pdg02GPA" name="pdg02GPA" class="form-control" placeholder="GPA" type="text" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="card bd-0 mg-b-20">
+                      <div class="card-header tx-medium bd-0 tx-white" style="background-color:#34495E;">
+                        Postgraduate Degree 03
+                      </div>
+                      <!-- card-header -->
+                      <div class="card-body bd bd-t-0">
+                        <!-- card-body -->
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Postgraduate Degree</p>
+                            <input
+                              id="pgDegree03"
+                              name="pgDegree03"
+                              class="form-control"
+                              placeholder="Postgraduate Degree"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">University</p>
+                            <input
+                              id="pdg03University"
+                              name="pdg03University"
+                              class="form-control"
+                              placeholder="University"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Country</p>
+                            <select
+                              class="form-control select2-no-search select2-hidden-accessible"
+                              data-select2-id="13"
+                              tabindex="-1"
+                              aria-hidden="true"
+                              id="pdg03Country"
+                              name="pdg03Country"
+                            >
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="row row-sm mg-b-20">
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Year</p>
+                            <input id="pdg03Year" name="pdg03Year" class="form-control" type="number" />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">Class</p>
+                            <input
+                              id="pdg03Class"
+                              name="pdg03Class"
+                              class="form-control"
+                              placeholder="Class"
+                              type="text"
+                            />
+                          </div>
+                          <div class="col-lg-4">
+                            <p class="mg-b-10">GPA</p>
+                            <input id="pdg03GPA" name="pdg03GPA" class="form-control" placeholder="GPA" type="text" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="card bd-0 mg-b-20">
+                      <div class="card-header tx-medium bd-0 tx-white" style="background-color:#34495E;">
+                        Experience
+                      </div>
+                      <!-- card-header -->
+                      <div class="card-body bd bd-t-0">
+                        <!-- card-body -->
+                        <div class="col-lg-12">
+                          <p class="mg-b-10">Work Experience</p>
+                          <textarea id="experience" rows="8" name="experience" class="form-control"></textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row row-sm mg-b-20">
+                      <button id="submitButton" type="submit" class="btn btn-indigo btn-rounded btn-block">
+                        SUBMIT
+                      </button>
                     </div>
                   </form>
-
-                  <button
-                    class="btn btn-primary btn-rounded"
-                    onclick="showSuccessModal('Save Success..!','App Data Save to database')"
-                  >
-                    Success Model
-                  </button>
-                  <button
-                    class="btn btn-primary btn-rounded"
-                    onclick="showErrorModal('Error..!','App Data save Error')"
-                  >
-                    Error Model
-                  </button>
-                  <button
-                    class="btn btn-primary btn-rounded"
-                    onclick="showAppAlert('info','Error..!','App Data save Error')"
-                  >
-                    App Alert
-                  </button>
-                  <a href="" class="btn btn-primary" data-toggle="modal" data-target="#modalInfo">Modal</a>
                 </div>
                 <!--End Home Tab-->
-
-                <!--Tab Content 2-->
-                <div id="log" role="tabpanel" aria-labelledby="log-tab" class="tab-pane fade px-4 py-5">
-                  <div style="background-color: white;">
-                    <!--Data Table-->
-                    <table id="tblData" class="display nowrap" width="100%">
-                      <thead style="background-color: white;">
-                        <tr>
-                          <th>First name</th>
-                          <th>Last name</th>
-                          <th>Position</th>
-                          <th>Office</th>
-                          <th>Age</th>
-                          <th>Start date</th>
-                          <th>Salary</th>
-                          <th>Extn.</th>
-                          <th>E-mail</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Tiger</td>
-                          <td>Nixon</td>
-                          <td>System Architect</td>
-                          <td>Edinburgh</td>
-                          <td>61</td>
-                          <td>2011/04/25</td>
-                          <td>$320,800</td>
-                          <td><span class="badge badge-pill badge-success tx-14">PROCESSED</span></td>
-                          <td>t.nixon@datatables.net</td>
-                        </tr>
-                        <tr>
-                          <td>Garrett</td>
-                          <td>Winters</td>
-                          <td>Accountant</td>
-                          <td>Tokyo</td>
-                          <td>63</td>
-                          <td>2011/07/25</td>
-                          <td>$170,750</td>
-                          <td><span class="badge badge-pill badge-warning tx-14">PENDING</span></td>
-                          <td>g.winters@datatables.net</td>
-                        </tr>
-                        <tr>
-                          <td>Ashton</td>
-                          <td>Cox</td>
-                          <td>Junior Technical Author</td>
-                          <td>San Francisco</td>
-                          <td>66</td>
-                          <td>2009/01/12</td>
-                          <td>$86,000</td>
-                          <td>
-                            <button class="btn btn-info" onclick="approved($(this))">
-                              <i class="fa fa-check-square-o"></i> PROCESS
-                              <i class="fa fa-spinner fa-pulse fa-2x fa-fw" style="display: none;"></i>
-                            </button>
-                          </td>
-                          <td>a.cox@datatables.net</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <!--End Data Table-->
-                  </div>
-                </div>
-                <!--End Tab Content 2-->
-
-                <!--Tab Content 3-->
-                <div id="contact" role="tabpanel" aria-labelledby="contact-tab" class="tab-pane fade px-4 py-5">
-                  <p class="text-muted">
-                    Lsssorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
-                    labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                    nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit
-                    esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                    culpa qui officia deserunt mollit anim id est laborum.
-                  </p>
-                  <p class="text-muted">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore
-                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                    culpa qui officia deserunt mollit anim id est laborum.
-                  </p>
-                </div>
-                <!--End Tab Content 3-->
               </div>
               <!-- End rounded tabs -->
               <!--END TAB PAGE-->
@@ -453,6 +880,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+
     <!--script src="./theme_js.js"></script>
       <script src="./custom_js.js"></script-->
     <?!= include('theme_js') ?>

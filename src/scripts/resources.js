@@ -7,7 +7,10 @@ class Resources {
     try {
       rtnObj.appUser = this.resolveAppUser();
       rtnObj.scriptUrl = Utils.getScriptUrl();
-      rtnObj.data = null;
+      rtnObj.appName = Utils.getAppName();
+      rtnObj.appDescription = Utils.getAppDescription();
+      rtnObj.appRedirectURL = Utils.getAppRedirectURL();
+      rtnObj.data = this.getVacancyData();
 
       return rtnObj;
     } catch (error) {
@@ -102,19 +105,122 @@ class Resources {
     }
   }
 
-  /*
-  static getData() {
+  static getVacancyData() {
     try {
       DatabaseOperations.cacheEnabled = false;
       DatabaseOperations.initilizeDatabase(Utils.getMainDBID());
-      DatabaseOperations.openDatabaseConnection(Utils.getAppRoleSheetName());
-      const foundObj = DatabaseOperations.queryDatabase(`KEY:Email === "${email}"`);
+      DatabaseOperations.openDatabaseConnection(Utils.getVacanciesSheetName());
+      const foundObj = DatabaseOperations.queryDatabase(`KEY:STATUS === "OPEN"`);
+
+      const retObj = {};
+
+      retObj.vacancies = foundObj;
+
+      return retObj;
     } catch (error) {
-      console.error('Error occurred while getData in Resources', error);
-      throw new Error(`Error occurred while getData`);
+      console.error('Error occurred while getVacancyData in Resources', error);
+      throw new Error(`Error occurred while getVacancyData`);
     }
   }
-  */
+
+  static saveRequest(obj) {
+    try {
+      if (obj) {
+        DatabaseOperations.cacheEnabled = false;
+        DatabaseOperations.initilizeDatabase(Utils.getMainDBID());
+        DatabaseOperations.openDatabaseConnection(Utils.getMainSheetName());
+
+        const currentDate = Utils.getCurrentDate();
+
+        const request = {
+          RID: '=ROW()',
+          SubmittedDate: currentDate,
+          Category: obj.Category,
+          Post: obj.Post,
+          VacancyID: obj.VacancyID,
+          Gender: obj.Gender,
+          Title: obj.Title,
+          FirstName: obj.FirstName,
+          Surname: obj.Surname,
+          FullName: obj.FullName,
+          DateOfBirth: obj.DateOfBirth,
+          PostalAddress: obj.PostalAddress,
+          NIC: obj.NIC,
+          Mobile: obj.Mobile,
+          Telephone: obj.Telephone,
+          Email: obj.Email,
+          District: obj.District,
+          Electorate: obj.Electorate,
+          Province: obj.Province,
+          City: obj.City,
+          Nationality: obj.Nationality,
+          Citizenship: obj.Citizenship,
+          CivilStatus: obj.CivilStatus,
+          SpouseName: obj.SpouseName,
+          SpouseDesignation: obj.SpouseDesignation,
+          Faculty: obj.Faculty,
+          Department: obj.Department,
+          HighestEducation: obj.HighestEducation,
+          ProficiencyOnLanguages: obj.ProficiencyOnLanguages,
+
+          BasicDegree: obj.BasicDegree,
+          BasicDegreeUniversity: obj.BasicDegreeUniversity,
+          BasicDegreeYear: obj.BasicDegreeYear,
+          BasicDegreeClass: obj.BasicDegreeClass,
+          BasicDegreeGPA: obj.BasicDegreeGPA,
+
+          PGDegree01: obj.PGDegree01,
+          PGDegree01University: obj.PGDegree01University,
+          PGDegree01Country: obj.PGDegree01Country,
+          PGDegree01Year: obj.PGDegree01Year,
+          PGDegree01Class: obj.PGDegree01Class,
+          PGDegree01GPA: obj.PGDegree01GPA,
+
+          PGDegree02: obj.PGDegree02,
+          PGDegree02University: obj.PGDegree02University,
+          PGDegree02Country: obj.PGDegree02Country,
+          PGDegree02Year: obj.PGDegree02Year,
+          PGDegree02Class: obj.PGDegree02Class,
+          PGDegree02GPA: obj.PGDegree02GPA,
+
+          PGDegree03: obj.PGDegree03,
+          PGDegree03University: obj.PGDegree03University,
+          PGDegree03Country: obj.PGDegree03Country,
+          PGDegree03Year: obj.PGDegree03Year,
+          PGDegree03Class: obj.PGDegree03Class,
+          PGDegree03GPA: obj.PGDegree03GPA,
+
+          Experience: obj.Experience
+        };
+
+        const funcStatus = DatabaseOperations.saveItem(request);
+
+        if (!funcStatus) {
+          console.error(`Error occurred while saveRequest in Resources`);
+        }
+
+        // Send Mail to Submitter
+        const heading = 'ONLINE APPLICATION - University of Peradeniya';
+        const description = 'Your application has been submitted successfully..!';
+        const name = obj.FullName;
+        const email = obj.Email;
+        const post = obj.Post;
+        const { VacancyID } = obj;
+        const faculty = obj.Faculty;
+        const department = obj.Department;
+        const emailAddress = `${obj.Email},${Utils.getProcessingEmails()}`;
+
+        Utils.sendMail(heading, description, emailAddress, name, email, post, VacancyID, faculty, department);
+
+        return funcStatus;
+      }
+
+      return '';
+    } catch (error) {
+      console.error('Error occurred while saveRequest in Resources', error);
+      throw new Error(`Error occurred while saveRequest`);
+    }
+  }
 }
 
 export default Resources;

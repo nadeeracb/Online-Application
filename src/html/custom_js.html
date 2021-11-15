@@ -1,4 +1,6 @@
 <script>
+  var redirectURL = '';
+  var vacanciesList;
   $(document).ready(function() {
     //Date
     var d = new Date();
@@ -19,13 +21,26 @@
       buttons: ['copy', 'excel', 'pdf', 'print']
     });
 
-    //Initial Loading
-    showLoadingModal('Please Wait for Loading...');
-    google.script.run
-      .withFailureHandler(onFailure)
-      .withSuccessHandler(initialLoading)
-      .initialLoading();
+    //Form Validate
+    $('form').each(function() {
+      applyValidateToElement($(this));
+    });
+
+    //JQuery Validate
+    jQuery.validator.addMethod(
+      'checkEqualChar',
+      function(value, element) {
+        return value.trim().charAt(0) !== '=' ? true : false;
+      },
+      'Can not put first letter as an equal sign'
+    );
+
+    onLoadExecutions();
   });
+
+  function checkEqualCharAvailable(value) {
+    return value.trim().charAt(0) === '=' ? true : false;
+  }
 
   function showSuccessModal(heading, message) {
     $('#successModalHeading').text(heading);
@@ -73,17 +88,6 @@
     showErrorModal('Error Occured..!', err.message);
   }
 
-  function initialLoading(retdata) {
-    console.log(retdata);
-    $('#modalLoading').modal('hide');
-    var data = JSON.parse(retdata);
-
-    if (data) {
-      setMenu(data.scriptUrl);
-      setUserInfo(data.appUser.data[0]);
-    }
-  }
-
   function setMenu(appurl) {
     $('#app-menu-01').attr('href', appurl);
     $('#app-menu-02').attr('href', appurl + '?page=hod');
@@ -94,5 +98,996 @@
     $('#userrole').text('(' + user.Role + ')');
   }
 
-  function logOut() {}
+  function setAppInfo(appName, appDescription, appRedirectURL) {
+    $('#appName').text(appName);
+    $('#appDescription').text(appDescription);
+    redirectURL = appRedirectURL;
+  }
+  function logOut() {
+    if (redirectURL && redirectURL != '' && redirectURL.length != 0) {
+      window.top.location.href = 'https://www.google.com/accounts/Logout?continue=' + redirectURL;
+    } else {
+      window.top.location.href = 'https://www.google.com/accounts/Logout';
+    }
+  }
+
+  function onLoadExecutions() {
+    //Initial Loading
+    showLoadingModal('Please Wait for Loading...');
+    google.script.run
+      .withFailureHandler(onFailure)
+      .withSuccessHandler(initialLoading)
+      .initialLoading();
+
+    districtList();
+    proviceList();
+    countryList();
+    facultiesList();
+    departmentsList();
+
+    $('#civilstatus').on('change', function() {
+      var type = $(this)
+        .find(':selected')
+        .val();
+
+      if (type == 'Married') {
+        $('#spouseDIV').show();
+      } else {
+        $('#spouseDIV').hide();
+      }
+    });
+
+    $('#category').on('change', function() {
+      var type = $(this)
+        .find(':selected')
+        .val();
+
+      if (type == 'Academic') {
+        setVacancies(type);
+      } else {
+        setVacancies(type);
+      }
+    });
+
+    $('#post').on('change', function() {
+      var type = $(this)
+        .find(':selected')
+        .val();
+      $('#vacancyID').val(type);
+    });
+  }
+
+  function initialLoading(retdata) {
+    $('#modalLoading').modal('hide');
+    var data = JSON.parse(retdata);
+
+    if (data) {
+      setMenu(data.scriptUrl);
+      setUserInfo(data.appUser.data[0]);
+      setAppInfo(data.appName, data.appDescription, data.appRedirectURL);
+
+      vacanciesList = data.data.vacancies;
+    }
+  }
+
+  //Validator
+  function applyValidateToElement(element) {
+    $(element).validate({
+      rules: {
+        category: {
+          required: true
+        },
+        post: {
+          required: true
+        },
+        vacancyID: {
+          required: true,
+          checkEqualChar: true
+        },
+        gender: {
+          required: true
+        },
+        title: {
+          required: true
+        },
+        firstName: {
+          required: true,
+          checkEqualChar: true
+        },
+        surname: {
+          required: true,
+          checkEqualChar: true
+        },
+        fullName: {
+          required: true,
+          checkEqualChar: true
+        },
+        dob: {
+          required: true,
+          date: true
+        },
+        address: {
+          required: true,
+          checkEqualChar: true
+        },
+        nic: {
+          required: true,
+          checkEqualChar: true
+        },
+        mobile: {
+          required: true,
+          checkEqualChar: true
+        },
+        tp: {
+          required: true,
+          checkEqualChar: true
+        },
+        email: {
+          required: true,
+          email: true
+        },
+        district: {
+          required: true
+        },
+        electorate: {
+          required: true,
+          checkEqualChar: true
+        },
+        province: {
+          required: true
+        },
+        city: {
+          required: true,
+          checkEqualChar: true
+        },
+        nationality: {
+          required: true,
+          checkEqualChar: true
+        },
+        citizenship: {
+          required: true
+        },
+        civilstatus: {
+          required: true
+        },
+        spouseName: {
+          required: function() {
+            if (
+              $('#civilstatus')
+                .find(':selected')
+                .val() == 'Married'
+            ) {
+              return true;
+            } else {
+              return false;
+            }
+          },
+          checkEqualChar: true
+        },
+        spouseDesignation: {
+          required: function() {
+            if (
+              $('#civilstatus')
+                .find(':selected')
+                .val() == 'Married'
+            ) {
+              return true;
+            } else {
+              return false;
+            }
+          },
+          checkEqualChar: true
+        },
+        faculty: {
+          required: true
+        },
+        department: {
+          required: true
+        },
+        highestEducation: {
+          required: true,
+          checkEqualChar: true
+        },
+        proficiencyOnLanguages: {
+          required: true
+        },
+        basicDegree: {
+          required: true,
+          checkEqualChar: true
+        },
+        bdUniversity: {
+          required: true,
+          checkEqualChar: true
+        },
+        bdYear: {
+          required: true,
+          number: true
+        },
+        bdClass: {
+          required: true,
+          checkEqualChar: true
+        },
+        bdGPA: {
+          required: true,
+          number: true
+        }
+      },
+      messages: {
+        category: {
+          required: 'Please select your Category'
+        },
+        post: {
+          required: 'Please select your Post'
+        },
+        vacancyID: {
+          required: 'Please enter Vacancy ID',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        gender: {
+          required: 'Please enter your Student ID'
+        },
+        title: {
+          required: 'Please your Batch'
+        },
+        firstName: {
+          required: 'Please enter your First Name',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        surname: {
+          required: 'Please Slect your Surname',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        fullName: {
+          required: 'Please enter your Full Name',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        dob: {
+          required: 'Please enter your Date of Birth',
+          date: 'Please enter your Correct Date of Birth'
+        },
+        address: {
+          required: 'Please enter your Postal Address',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        nic: {
+          required: 'Please enter your NIC Number',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        mobile: {
+          required: 'Please enter your Mobile Number',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        tp: {
+          required: 'Please enter your Residential Telephone Number',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        email: {
+          required: 'Please enter your Email Address',
+          email: 'Email is not valid'
+        },
+        district: {
+          required: 'Please select your District',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        electorate: {
+          required: 'Please enter your Electorate',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        province: {
+          required: 'Please select your Province'
+        },
+        city: {
+          required: 'Please enter your City',
+          number: 'Required Number'
+        },
+        nationality: {
+          required: 'Please select your Nationality',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        citizenship: {
+          required: 'Please select your Citizenship'
+        },
+        civilstatus: {
+          required: 'Please select your Civil Status'
+        },
+        spouseName: {
+          required: 'Please select your Supouse Name',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        faculty: {
+          required: 'Please select the Faculty'
+        },
+        department: {
+          required: 'Please select the Department'
+        },
+        highestEducation: {
+          required: 'Please enter your Highest Education Qualification',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        proficiencyOnLanguages: {
+          required: 'Please select the Proficiency on Languages'
+        },
+        basicDegree: {
+          required: 'Please enter your Basic Degree',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        bdUniversity: {
+          required: 'Please enter the University',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        bdYear: {
+          required: 'Please enter the Year',
+          number: 'Required Number'
+        },
+        bdClass: {
+          required: 'Please enter Class',
+          checkEqualChar: 'Can not put first letter as an equal sign'
+        },
+        bdGPA: {
+          required: 'Please enter GPA',
+          number: 'Required Number'
+        }
+      },
+      submitHandler: function(form) {
+        if (event.target.id == 'appMainForm') {
+          event.preventDefault();
+          $('#submitButton').prop('disabled', true);
+          showLoadingModal('Please Wait for Saving your request...');
+          submitForm();
+        }
+        return false;
+      }
+    });
+  }
+  //End Validator
+
+  function submitForm() {
+    var category = $('#category')
+      .find(':selected')
+      .val();
+    var post = $('#post')
+      .find(':selected')
+      .text();
+
+    var vid = $('#vacancyID').val();
+
+    var gender = $('#gender')
+      .find(':selected')
+      .val();
+
+    var title = $('#title')
+      .find(':selected')
+      .val();
+
+    var firstName = $('#firstName').val();
+    var surname = $('#surname').val();
+    var fullName = $('#fullName').val();
+
+    var dob = $('#dob').val();
+    var address = $('#address').val();
+    var nic = $('#nic').val();
+    var mobile = $('#mobile').val();
+    var tp = $('#tp').val();
+    var email = $('#email').val();
+
+    var district = $('#district')
+      .find(':selected')
+      .val();
+
+    var title = $('#title')
+      .find(':selected')
+      .val();
+
+    var electorate = $('#electorate').val();
+
+    var province = $('#province')
+      .find(':selected')
+      .val();
+
+    var city = $('#city').val();
+
+    var nationality = $('#nationality')
+      .find(':selected')
+      .val();
+
+    var citizenship = $('#citizenship')
+      .find(':selected')
+      .val();
+
+    var civilstatus = $('#civilstatus')
+      .find(':selected')
+      .val();
+
+    var spouseName = $('#spouseName').val();
+    var spouseDesignation = $('#spouseDesignation').val();
+
+    var faculty = $('#faculty')
+      .find(':selected')
+      .val();
+
+    var department = $('#department')
+      .find(':selected')
+      .val();
+
+    var highestEducation = $('#highestEducation').val();
+    var proficiencyOnLanguages = $('#proficiencyOnLanguages')
+      .find(':selected')
+      .val();
+
+    var basicDegree = $('#basicDegree').val();
+    var bdUniversity = $('#bdUniversity').val();
+    var bdYear = $('#bdYear').val();
+    var bdClass = $('#bdClass').val();
+    var bdGPA = $('#bdGPA').val();
+
+    var pgDegree01 = $('#pgDegree01').val();
+    var pdg01University = $('#pdg01University').val();
+    var pdg01Country = $('#pdg01Country')
+      .find(':selected')
+      .val();
+    var pgd01Year = $('#pgd01Year').val();
+    var pgd01Class = $('#pgd01Class').val();
+    var pgd01GPA = $('#pgd01GPA').val();
+
+    var pgDegree02 = $('#pgDegree02').val();
+    var pdg02University = $('#pdg02University').val();
+    var pdg02Country = $('#pdg02Country')
+      .find(':selected')
+      .val();
+    var pgd02Year = $('#pdg02Year').val();
+    var pgd02Class = $('#pdg02Class').val();
+    var pgd02GPA = $('#pdg02GPA').val();
+
+    var pgDegree03 = $('#pgDegree03').val();
+    var pdg03University = $('#pdg03University').val();
+    var pdg03Country = $('#pdg03Country')
+      .find(':selected')
+      .val();
+    var pgd03Year = $('#pdg03Year').val();
+    var pgd03Class = $('#pdg03Class').val();
+    var pgd03GPA = $('#pdg03GPA').val();
+
+    var experience = $('#experience').val();
+
+    const request = {
+      Category: category,
+      Post: post,
+      VacancyID: vid,
+      Gender: gender,
+      Title: title,
+      FirstName: firstName,
+      Surname: surname,
+      FullName: fullName,
+      DateOfBirth: dob,
+      PostalAddress: address,
+      NIC: nic,
+      Mobile: mobile,
+      Telephone: tp,
+      Email: email,
+      District: district,
+      Electorate: electorate,
+      Province: province,
+      City: city,
+      Nationality: nationality,
+      Citizenship: citizenship,
+      CivilStatus: civilstatus,
+      SpouseName: spouseName,
+      SpouseDesignation: spouseDesignation,
+      Faculty: faculty,
+      Department: department,
+      HighestEducation: highestEducation,
+      ProficiencyOnLanguages: proficiencyOnLanguages,
+
+      BasicDegree: basicDegree,
+      BasicDegreeUniversity: bdUniversity,
+      BasicDegreeYear: bdYear,
+      BasicDegreeClass: bdClass,
+      BasicDegreeGPA: bdGPA,
+
+      PGDegree01: pgDegree01,
+      PGDegree01University: pdg01University,
+      PGDegree01Country: pdg01Country,
+      PGDegree01Year: pgd01Year,
+      PGDegree01Class: pgd01Class,
+      PGDegree01GPA: pgd01GPA,
+
+      PGDegree02: pgDegree02,
+      PGDegree02University: pdg02University,
+      PGDegree02Country: pdg02Country,
+      PGDegree02Year: pgd02Year,
+      PGDegree02Class: pgd02Class,
+      PGDegree02GPA: pgd02GPA,
+
+      PGDegree03: pgDegree03,
+      PGDegree03University: pdg03University,
+      PGDegree03Country: pdg03Country,
+      PGDegree03Year: pgd03Year,
+      PGDegree03Class: pgd03Class,
+      PGDegree03GPA: pgd03GPA,
+
+      Experience: experience
+    };
+
+    google.script.run
+      .withFailureHandler(onFailure)
+      .withSuccessHandler(saveRequestSuccess)
+      .saveRequest(request);
+  }
+
+  function saveRequestSuccess(retdata) {
+    console.log('save Data' + retdata);
+    $('#modalLoading').modal('hide');
+    $('#submitButton').prop('disabled', false);
+
+    var data = JSON.parse(retdata);
+    if (data.status == true) {
+      showSuccessModal('Save Success..!', 'Data Save to database');
+    }
+  }
+
+  function districtList() {
+    const dlist = [
+      'Ampara',
+      'Anuradhapura',
+      'Badulla',
+      'Batticaloa',
+      'Colombo',
+      'Galle',
+      'Gampaha',
+      'Hambantota',
+      'Jaffna',
+      'Kalutara',
+      'Kandy',
+      'Kegalle',
+      'Kilinochchi',
+      'Kurunegala',
+      'Mannar',
+      'Matale',
+      'Matara',
+      'Monaragala',
+      'Mullaitivu',
+      'Nuwara Eliya',
+      'Polonnaruwa',
+      'Puttalam',
+      'Ratnapura',
+      'Trincomalee',
+      'Vavuniya'
+    ];
+    $('#district').append(`<option label="Choose one" value="">Choose one</option>`);
+
+    for (var i = 0; i < dlist.length; i++) {
+      $('#district').append(`<option value="${dlist[i]}">${dlist[i]}</option>`);
+    }
+  }
+
+  function proviceList() {
+    const plist = [
+      'Northern',
+      'North Western',
+      'Western',
+      'North Central',
+      'Central',
+      'Sabaragamuwa',
+      'Eastern',
+      'Uva',
+      'Southern'
+    ];
+    $('#province').append(`<option label="Choose one" value="">Choose one</option>`);
+
+    for (var i = 0; i < plist.length; i++) {
+      $('#province').append(`<option value="${plist[i]}">${plist[i]}</option>`);
+    }
+  }
+
+  function countryList() {
+    const countryList = [
+      'Afghanistan',
+      'Albania',
+      'Algeria',
+      'American Samoa',
+      'Andorra',
+      'Angola',
+      'Anguilla',
+      'Antarctica',
+      'Antigua and Barbuda',
+      'Argentina',
+      'Armenia',
+      'Aruba',
+      'Australia',
+      'Austria',
+      'Azerbaijan',
+      'Bahamas (the)',
+      'Bahrain',
+      'Bangladesh',
+      'Barbados',
+      'Belarus',
+      'Belgium',
+      'Belize',
+      'Benin',
+      'Bermuda',
+      'Bhutan',
+      'Bolivia (Plurinational State of)',
+      'Bonaire, Sint Eustatius and Saba',
+      'Bosnia and Herzegovina',
+      'Botswana',
+      'Bouvet Island',
+      'Brazil',
+      'British Indian Ocean Territory (the)',
+      'Brunei Darussalam',
+      'Bulgaria',
+      'Burkina Faso',
+      'Burundi',
+      'Cabo Verde',
+      'Cambodia',
+      'Cameroon',
+      'Canada',
+      'Cayman Islands (the)',
+      'Central African Republic (the)',
+      'Chad',
+      'Chile',
+      'China',
+      'Christmas Island',
+      'Cocos (Keeling) Islands (the)',
+      'Colombia',
+      'Comoros (the)',
+      'Congo (the Democratic Republic of the)',
+      'Congo (the)',
+      'Cook Islands (the)',
+      'Costa Rica',
+      'Croatia',
+      'Cuba',
+      'Curaçao',
+      'Cyprus',
+      'Czechia',
+      "Côte d'Ivoire",
+      'Denmark',
+      'Djibouti',
+      'Dominica',
+      'Dominican Republic (the)',
+      'Ecuador',
+      'Egypt',
+      'El Salvador',
+      'Equatorial Guinea',
+      'Eritrea',
+      'Estonia',
+      'Eswatini',
+      'Ethiopia',
+      'Falkland Islands (the) [Malvinas]',
+      'Faroe Islands (the)',
+      'Fiji',
+      'Finland',
+      'France',
+      'French Guiana',
+      'French Polynesia',
+      'French Southern Territories (the)',
+      'Gabon',
+      'Gambia (the)',
+      'Georgia',
+      'Germany',
+      'Ghana',
+      'Gibraltar',
+      'Greece',
+      'Greenland',
+      'Grenada',
+      'Guadeloupe',
+      'Guam',
+      'Guatemala',
+      'Guernsey',
+      'Guinea',
+      'Guinea-Bissau',
+      'Guyana',
+      'Haiti',
+      'Heard Island and McDonald Islands',
+      'Holy See (the)',
+      'Honduras',
+      'Hong Kong',
+      'Hungary',
+      'Iceland',
+      'India',
+      'Indonesia',
+      'Iran (Islamic Republic of)',
+      'Iraq',
+      'Ireland',
+      'Isle of Man',
+      'Israel',
+      'Italy',
+      'Jamaica',
+      'Japan',
+      'Jersey',
+      'Jordan',
+      'Kazakhstan',
+      'Kenya',
+      'Kiribati',
+      "Korea (the Democratic People's Republic of)",
+      'Korea (the Republic of)',
+      'Kuwait',
+      'Kyrgyzstan',
+      "Lao People's Democratic Republic (the)",
+      'Latvia',
+      'Lebanon',
+      'Lesotho',
+      'Liberia',
+      'Libya',
+      'Liechtenstein',
+      'Lithuania',
+      'Luxembourg',
+      'Macao',
+      'Madagascar',
+      'Malawi',
+      'Malaysia',
+      'Maldives',
+      'Mali',
+      'Malta',
+      'Marshall Islands (the)',
+      'Martinique',
+      'Mauritania',
+      'Mauritius',
+      'Mayotte',
+      'Mexico',
+      'Micronesia (Federated States of)',
+      'Moldova (the Republic of)',
+      'Monaco',
+      'Mongolia',
+      'Montenegro',
+      'Montserrat',
+      'Morocco',
+      'Mozambique',
+      'Myanmar',
+      'Namibia',
+      'Nauru',
+      'Nepal',
+      'Netherlands (the)',
+      'New Caledonia',
+      'New Zealand',
+      'Nicaragua',
+      'Niger (the)',
+      'Nigeria',
+      'Niue',
+      'Norfolk Island',
+      'Northern Mariana Islands (the)',
+      'Norway',
+      'Oman',
+      'Pakistan',
+      'Palau',
+      'Palestine, State of',
+      'Panama',
+      'Papua New Guinea',
+      'Paraguay',
+      'Peru',
+      'Philippines (the)',
+      'Pitcairn',
+      'Poland',
+      'Portugal',
+      'Puerto Rico',
+      'Qatar',
+      'Republic of North Macedonia',
+      'Romania',
+      'Russian Federation (the)',
+      'Rwanda',
+      'Réunion',
+      'Saint Barthélemy',
+      'Saint Helena, Ascension and Tristan da Cunha',
+      'Saint Kitts and Nevis',
+      'Saint Lucia',
+      'Saint Martin (French part)',
+      'Saint Pierre and Miquelon',
+      'Saint Vincent and the Grenadines',
+      'Samoa',
+      'San Marino',
+      'Sao Tome and Principe',
+      'Saudi Arabia',
+      'Senegal',
+      'Serbia',
+      'Seychelles',
+      'Sierra Leone',
+      'Singapore',
+      'Sint Maarten (Dutch part)',
+      'Slovakia',
+      'Slovenia',
+      'Solomon Islands',
+      'Somalia',
+      'South Africa',
+      'South Georgia and the South Sandwich Islands',
+      'South Sudan',
+      'Spain',
+      'Sri Lanka',
+      'Sudan (the)',
+      'Suriname',
+      'Svalbard and Jan Mayen',
+      'Sweden',
+      'Switzerland',
+      'Syrian Arab Republic',
+      'Taiwan',
+      'Tajikistan',
+      'Tanzania, United Republic of',
+      'Thailand',
+      'Timor-Leste',
+      'Togo',
+      'Tokelau',
+      'Tonga',
+      'Trinidad and Tobago',
+      'Tunisia',
+      'Turkey',
+      'Turkmenistan',
+      'Turks and Caicos Islands (the)',
+      'Tuvalu',
+      'Uganda',
+      'Ukraine',
+      'United Arab Emirates (the)',
+      'United Kingdom of Great Britain and Northern Ireland (the)',
+      'United States Minor Outlying Islands (the)',
+      'United States of America (the)',
+      'Uruguay',
+      'Uzbekistan',
+      'Vanuatu',
+      'Venezuela (Bolivarian Republic of)',
+      'Viet Nam',
+      'Virgin Islands (British)',
+      'Virgin Islands (U.S.)',
+      'Wallis and Futuna',
+      'Western Sahara',
+      'Yemen',
+      'Zambia',
+      'Zimbabwe',
+      'Åland Islands'
+    ];
+
+    $('#pdg01Country').append(`<option label="Choose one" value="">Choose one</option>`);
+    $('#pdg02Country').append(`<option label="Choose one" value="">Choose one</option>`);
+    $('#pdg03Country').append(`<option label="Choose one" value="">Choose one</option>`);
+
+    for (var i = 0; i < countryList.length; i++) {
+      $('#pdg01Country').append(`<option value="${countryList[i]}">${countryList[i]}</option>`);
+      $('#pdg02Country').append(`<option value="${countryList[i]}">${countryList[i]}</option>`);
+      $('#pdg03Country').append(`<option value="${countryList[i]}">${countryList[i]}</option>`);
+    }
+  }
+
+  function setVacancies(category) {
+    $('#post').empty();
+    $('#post').append(`<option label="Choose one" value="">Choose one</option>`);
+    console.log('Vacancy List : ' + JSON.stringify(vacanciesList));
+    if (vacanciesList) {
+      for (var i = 0; i < vacanciesList.length; i++) {
+        if (vacanciesList[i].CATEGORY == category) {
+          $('#post').append(`<option value="${vacanciesList[i].VID}">${vacanciesList[i].POST}</option>`);
+        }
+      }
+    }
+  }
+
+  function facultiesList() {
+    const facList = [
+      'Faculty of Science',
+      'Faculty of Veterinary Medicine and Animal Science',
+      'Faculty of Medicine',
+      'Faculty of Agriculture',
+      'Faculty of Dental',
+      'Faculty of Management',
+      'Faculty of Arts',
+      'Faculty of Allied Health Sciences',
+      'Faculty of Engineering',
+      'Library',
+      'IT Centre',
+      'Physical Education',
+      'Career Guidance Unit',
+      'General Administration',
+      'Financial Administration Division'
+    ];
+
+    $('#faculty').append(`<option label="Choose one" value="">Choose one</option>`);
+
+    for (var i = 0; i < facList.length; i++) {
+      $('#faculty').append(`<option value="${facList[i]}">${facList[i]}</option>`);
+    }
+  }
+
+  function departmentsList() {
+    const deptList = [
+      'Statistics and Computer Science',
+      'Mathematics',
+      'Botany',
+      'Molecular Biology & Biotechnology',
+      'Physics',
+      'Geology',
+      'Zoology',
+      'Chemistry',
+      'SIIC',
+      'English Language Teaching (ELTU)',
+      'Environmental & Industrial Sciences',
+      'FQAC',
+      'Science Education',
+      'Deans Office',
+      'Crop Science',
+      'Agricultural Biology',
+      'Mahailluppallama Sub Campus',
+      'Animal Science',
+      'Agricultural Biotechnology Centre',
+      'Agricultural Engineering',
+      'Agribusiness Centre',
+      'Food Science and Technology',
+      'Soil Science',
+      'Anatomy',
+      'Pathology',
+      'Physiology',
+      'Medical Education',
+      'Parasitology',
+      'Radiology',
+      'Paediatrics',
+      'Surgery',
+      'Biochemistry',
+      'Microbiology',
+      'Deans Office',
+      'Nuclear Medicine Unit',
+      'Community Medicine',
+      'Forensic Medicine',
+      'Psychiatry',
+      'Pharmacology',
+      'Anaesthesiology & Critical Care',
+      'Medicine',
+      'Veterinary Clinical Sciences',
+      'Basic Veterinary Sciences',
+      'Veterinary Pathobiology',
+      'Veterinary Public Health & Pharmacology',
+      'Farm Animal & Production Health',
+      'Basic Sciences',
+      'Community Dental Health',
+      'Oral Medicine & Periodontology',
+      'Oral & Maxillofacial Surgery',
+      'Oral Pathology',
+      'Prosthetic Dentistry',
+      'Restrotive Dentistry',
+      'Business Finance',
+      'Human Resource Management',
+      'Marketing Management',
+      'Operations Management',
+      'Fine Arts',
+      'Sociology',
+      'Economics and Statistics',
+      'Political Science',
+      'Classical Language',
+      'History',
+      'Philosophy',
+      'English',
+      'Arabic & Islamic Civilization',
+      'Archaeology',
+      'Education',
+      'Geography',
+      'Pali and Buddhist Studies',
+      'Law',
+      'Psychology',
+      'Sinhala',
+      'Tamil',
+      'Basic Science',
+      'Physiotherapy',
+      'Radiography',
+      'Nursing',
+      'Pharmacy',
+      'ELibrary',
+      'MLS',
+      'Agricultural Economics and Business Management',
+      'Agricultural Extension',
+      'Obstetrics and Gynecology',
+      'Pediatrics',
+      'Veterinary Teaching Farm',
+      'Management Studies',
+      'Chemical & Process Engineering',
+      'Civil Engineering',
+      'Computer Engineering',
+      'Electrical & Electronic Engineering',
+      'Mechanical Engineering',
+      'Manufacturing and Industrial Engineering',
+      'Engineering Management',
+      'Industrial Training and Career Guidance Unit',
+      'Engineering Mathematics',
+      'Computer Center',
+      'Network and Communication Service'
+    ];
+
+    $('#department').append(`<option label="Choose one" value="">Choose one</option>`);
+
+    for (var i = 0; i < deptList.length; i++) {
+      $('#department').append(`<option value="${deptList[i]}">${deptList[i]}</option>`);
+    }
+  }
 </script>

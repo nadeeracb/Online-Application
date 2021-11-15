@@ -26,6 +26,11 @@ function initialLoading() {
   return JSON.stringify(Resources.initialLoading());
 }
 
+function saveRequest(obj) {
+  return JSON.stringify(Resources.saveRequest(obj));
+}
+
 global.doGet = doGet;
 global.include = include;
 global.initialLoading = initialLoading;
+global.saveRequest = saveRequest;
